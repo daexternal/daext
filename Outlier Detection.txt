@@ -1,0 +1,26 @@
+install.packages("tidyr") 
+library(tidyr)
+set.seed(123)
+day <- data.frame(
+  temp = rnorm(100, mean = 20, sd = 5),       # Random temperatures
+  hum = rnorm(100, mean = 60, sd = 10),        # Random humidity percentages
+  windspeed = rnorm(100, mean = 10, sd = 3)    # Random wind speeds
+)
+day$temp[c(10, 20, 30)] <- c(40, 45, 50)      # Adding extreme temperatures
+day$hum[c(15, 25, 35)] <- c(10, 5, 0)         # Adding extreme humidity values
+day$windspeed[c(40, 50, 60)] <- c(25, 30, 35) # Adding extreme wind speeds
+day$temp[c(5, 15)] <- NA
+day$hum[c(10, 20)] <- NA
+day$windspeed[c(30, 40)] <- NA
+print(head(day))
+print(sum(is.na(day)))
+boxplot(day[, c("temp", "hum", "windspeed")], main = "Boxplots of Raw Data")
+for(i in c("hum", "windspeed")) {
+  data <- unlist(day[i])
+  outliers <- boxplot.stats(data)$out
+  data[data %in% outliers] <- NA
+  day[i] <- data
+}
+print(sum(is.na(day)))
+day_clean <- drop_na(day)
+boxplot(day_clean[, c("temp", "hum", "windspeed")], main = "Boxplots of Cleaned Data")
